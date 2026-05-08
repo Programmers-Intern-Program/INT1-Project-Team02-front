@@ -1,0 +1,55 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { ArrowRight, FolderKanban, Plus } from "lucide-react";
+import { getProjects } from "../api/flodi";
+import { Badge } from "../components/ui/Badge";
+import { Button } from "../components/ui/Button";
+import { EmptyState } from "../components/ui/EmptyState";
+import { PageHeader } from "../components/ui/PageHeader";
+import { Panel } from "../components/ui/Panel";
+import { formatDateTime } from "../lib/utils";
+
+export function ProjectsPage() {
+  const projectsQuery = useQuery({
+    queryKey: ["projects"],
+    queryFn: getProjects,
+  });
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow="Projects"
+        title="프로젝트 목록"
+        description="백엔드의 `GET /api/v1/projects`를 사용해 프로젝트를 조회합니다."
+        actions={<Button variant="secondary" disabled><Plus size={16} />새 프로젝트</Button>}
+      />
+      <Panel>
+        {projectsQuery.isLoading ? (
+          <p className="text-sm text-slate-500">프로젝트 목록을 불러오는 중입니다.</p>
+        ) : projectsQuery.isError ? (
+          <EmptyState title="프로젝트 목록을 불러오지 못했습니다" description="백엔드 서버 또는 API base URL을 확인해주세요." icon={<FolderKanban size={18} />} />
+        ) : !projectsQuery.data?.length ? (
+          <EmptyState title="프로젝트 없음" description="Discord 봇 또는 API로 프로젝트를 생성하면 이곳에 표시됩니다." icon={<FolderKanban size={18} />} />
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {projectsQuery.data.map((project) => (
+              <Link key={project.id} to={`/projects/${project.id}`} className="group rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:border-slate-300 hover:bg-white">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900">{project.name}</p>
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">{project.description ?? "설명이 아직 없습니다."}</p>
+                  </div>
+                  <ArrowRight size={16} className="mt-1 shrink-0 text-slate-400 transition group-hover:translate-x-0.5" />
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  {project.techStack && <Badge tone="blue">{project.techStack}</Badge>}
+                  <span className="text-xs text-slate-500">{formatDateTime(project.createdAt)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
