@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
 import { ArrowRight, Bot, PlugZap } from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
 import { getProjectByChannel } from "../api/flodi";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -13,22 +13,30 @@ const demoChannelId = "demo-channel";
 
 export function HomePage() {
   const discord = useDiscordContext();
+  const isActivityFallback = discord.mode === "activity";
   const channelId = discord.channelId ?? demoChannelId;
   const projectQuery = useQuery({
     queryKey: ["project-by-channel", channelId],
     queryFn: () => getProjectByChannel(channelId),
-    enabled: Boolean(channelId),
+    enabled: Boolean(channelId) && !isActivityFallback,
   });
+
+  if (isActivityFallback) {
+    return <Navigate to="/activity" replace />;
+  }
 
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Discord meeting dashboard"
-        title="회의 흐름을 프로젝트 기억으로 연결하세요"
-        description="봇은 회의의 입구와 알림을 맡고, 대시보드는 프로젝트 맥락과 결정사항을 빠르게 확인하는 작업 공간이 됩니다."
+        title="Flodi dashboard"
+        description="The bot stays focused on entry points and quick actions, while this dashboard carries the project and meeting workspace."
         actions={
           <Link to={`/channels/${channelId}/dashboard`}>
-            <Button><PlugZap size={16} />채널 대시보드</Button>
+            <Button>
+              <PlugZap size={16} />
+              Channel dashboard
+            </Button>
           </Link>
         }
       />
@@ -46,16 +54,23 @@ export function HomePage() {
 
         <Panel title="Backend connection">
           {projectQuery.isLoading ? (
-            <p className="text-sm text-slate-500">채널 프로젝트를 확인하는 중입니다.</p>
+            <p className="text-sm text-slate-500">Checking the channel project.</p>
           ) : projectQuery.isError ? (
-            <EmptyState title="백엔드 연결 대기" description="Spring Boot API가 꺼져 있어도 화면은 유지됩니다. 서버 실행 후 다시 시도하세요." icon={<Bot size={18} />} />
+            <EmptyState
+              title="Backend connection pending"
+              description="The screen stays stable even when the Spring Boot API is not running. Start the backend and retry."
+              icon={<Bot size={18} />}
+            />
           ) : projectQuery.data ? (
             <div className="space-y-2">
               <p className="text-sm font-medium text-slate-900">{projectQuery.data.name}</p>
-              <p className="text-sm text-slate-500">현재 채널과 연결된 프로젝트가 감지되었습니다.</p>
+              <p className="text-sm text-slate-500">A project is connected to this channel.</p>
             </div>
           ) : (
-            <EmptyState title="연결된 프로젝트 없음" description="Discord 봇에서 프로젝트를 만들거나 연결하면 이곳에 표시됩니다." />
+            <EmptyState
+              title="No connected project"
+              description="Create or connect a project from the Discord bot and it will appear here."
+            />
           )}
         </Panel>
       </div>
@@ -67,7 +82,11 @@ export function HomePage() {
             ["Project detail", "/projects/1"],
             ["Meeting detail", "/meetings/1"],
           ].map(([label, href]) => (
-            <Link key={href} to={href} className="group flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 hover:border-slate-300 hover:bg-white">
+            <Link
+              key={href}
+              to={href}
+              className="group flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 hover:border-slate-300 hover:bg-white"
+            >
               {label}
               <ArrowRight size={15} className="text-slate-400 transition group-hover:translate-x-0.5" />
             </Link>

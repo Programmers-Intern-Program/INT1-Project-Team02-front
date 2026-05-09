@@ -1,9 +1,14 @@
 import { createContext, useContext } from "react";
+import type { DiscordSDK } from "@discord/embedded-app-sdk";
 
 export type DiscordMode = "web" | "activity";
+export type DiscordSdkStatus = "idle" | "loading" | "ready" | "error";
 
 export type DiscordContextValue = {
   mode: DiscordMode;
+  sdkStatus: DiscordSdkStatus;
+  sdkError: string | null;
+  sdk: DiscordSDK | null;
   serverId: string | null;
   channelId: string | null;
   userId: string | null;
