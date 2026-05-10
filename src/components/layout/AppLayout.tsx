@@ -1,7 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Bot, LayoutDashboard, ListChecks, Radio } from "lucide-react";
+import { Bot, LayoutDashboard, ListChecks } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { useDiscordContext } from "../../lib/discord/DiscordContext";
 
 const navItems = [
   { to: "/", label: "Home", icon: LayoutDashboard },
@@ -9,8 +8,6 @@ const navItems = [
 ];
 
 export function AppLayout() {
-  const discord = useDiscordContext();
-
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -36,10 +33,6 @@ export function AppLayout() {
               </NavLink>
             ))}
           </nav>
-          <div className="hidden items-center gap-2 text-xs text-slate-500 md:flex">
-            <Radio size={14} />
-            {discord.mode === "activity" ? "Discord Activity" : "Web mode"}
-          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">

@@ -1,29 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Bot, PlugZap } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getProjectByChannel } from "../api/flodi";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Panel } from "../components/ui/Panel";
-import { StatusPill } from "../components/ui/StatusPill";
-import { useDiscordContext } from "../lib/discord/DiscordContext";
 
 const demoChannelId = "demo-channel";
 
 export function HomePage() {
-  const discord = useDiscordContext();
-  const isActivityFallback = discord.mode === "activity";
-  const channelId = discord.channelId ?? demoChannelId;
+  const channelId = demoChannelId;
   const projectQuery = useQuery({
     queryKey: ["project-by-channel", channelId],
     queryFn: () => getProjectByChannel(channelId),
-    enabled: Boolean(channelId) && !isActivityFallback,
   });
-
-  if (isActivityFallback) {
-    return <Navigate to="/activity" replace />;
-  }
 
   return (
     <div className="space-y-6">
@@ -48,7 +39,6 @@ export function HomePage() {
               <p className="text-sm font-medium text-slate-900">Discord button route</p>
               <p className="mt-1 text-sm text-slate-500">/channels/{channelId}/dashboard</p>
             </div>
-            <StatusPill status={discord.mode === "activity" ? "Activity ready" : "Web mode"} />
           </div>
         </Panel>
 

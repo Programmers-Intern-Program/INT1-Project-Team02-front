@@ -6,7 +6,13 @@
       "Bash(Format-Table -AutoSize)",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\c\\\\Desktop\\\\devcourse\\\\flodi-front\\\\src\\\\pages\" -File)",
       "Bash(Select-Object Name)",
-      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\c\\\\Desktop\\\\devcourse\\\\INT1-Project-Team02\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"DIR\"}else{\"FILE\"}}} | Format-Table -AutoSize)"
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\c\\\\Desktop\\\\devcourse\\\\INT1-Project-Team02\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"DIR\"}else{\"FILE\"}}} | Format-Table -AutoSize)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"const sdk = require\\('@discord/embedded-app-sdk'\\); console.log\\(Object.keys\\(sdk\\)\\)\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\c\\\\Desktop\\\\devcourse\\\\INT1-Project-Team02\\\\src\\\\main\\\\java\\\\com\\\\flodiback\\\\bot\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(find \"C:\\\\\\\\Users\\\\\\\\c\\\\\\\\Desktop\\\\\\\\devcourse\\\\\\\\INT1-Project-Team02\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\com\\\\\\\\flodiback\\\\\\\\bot\" -type f -name \"*.java\")"
     ]
   }
 }

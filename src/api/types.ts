@@ -77,3 +77,19 @@ export type ChannelDashboardData = {
   project: Project | null;
   decisions: Decision[];
 };
+
+export type ActiveMeeting = {
+  meetingId: number;
+  title: string | null;
+};
+
+export type CaptionEvent = {
+  type: "caption.partial" | "caption.final";
+  meetingId: number;
+  speakerDiscordId: string;
+  speakerName: string;
+  text: string;
+  isFinal: boolean;
+  sequence: number;
+  sentAt: string;
+};

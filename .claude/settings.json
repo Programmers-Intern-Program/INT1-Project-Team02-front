@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"C:\\\\\\\\Users\\\\\\\\c\\\\\\\\Desktop\\\\\\\\devcourse\\\\\\\\INT1-Project-Team02\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\com\\\\\\\\flodiback\\\\\\\\bot\" -type f -name \"*.java\")",
+      "Bash(grep -r \"Activity\\\\|Slash\\\\|slash\" \"C:\\\\\\\\Users\\\\\\\\c\\\\\\\\Desktop\\\\\\\\devcourse\\\\\\\\INT1-Project-Team02\\\\\\\\src\\\\\\\\main\\\\\\\\java\\\\\\\\com\\\\\\\\flodiback\\\\\\\\bot\")",
+      "Read(//c/Users/c/.gradle/**)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.jda.wiki)",
+      "WebSearch",
+      "Bash(npm uninstall *)",
+      "Read(//c/Users/c/Desktop/devcourse/INT1-Project-Team02/**)"
+    ]
+  }
+}

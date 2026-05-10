@@ -9,7 +9,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@discord/embedded-app-sdk": "^1.9.0",
+    "@stomp/stompjs": "^7.3.0",
     "@tailwindcss/vite": "latest",
     "@tanstack/react-query": "latest",
     "@vitejs/plugin-react": "latest",

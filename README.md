@@ -18,12 +18,10 @@ The dev server runs with Vite. By default it is available at `http://localhost:5
 Copy `.env.example` to `.env` when local overrides are needed.
 
 ```env
-VITE_DISCORD_CLIENT_ID=your_discord_client_id_here
 VITE_API_BASE_URL=http://localhost:8080
-VITE_ACTIVITY_API_BASE_URL=/api
 ```
 
-`VITE_API_BASE_URL` is used in normal web mode. `VITE_ACTIVITY_API_BASE_URL` is used when the app detects a Discord Activity iframe with `window.self !== window.top`; `discord_activity=1` is supported only as a manual testing hint.
+`VITE_API_BASE_URL` points the dashboard at the Spring Boot API server.
 
 ## Backend Connection
 
@@ -52,29 +50,18 @@ Known gaps handled with empty states:
 - Project-level work log list API
 - Dedicated channel dashboard aggregate API
 
-## Discord Activity Local Smoke Test
+## Web Dashboard Tunnel
 
-1. Set `VITE_DISCORD_CLIENT_ID` in `.env`.
-2. Start Vite on port 5173.
+Start Vite on port 5173.
 
 ```bash
 npm run dev -- --port 5173
 ```
 
-3. Start an HTTPS tunnel.
+Expose the dashboard when Discord bot links need to open it from outside localhost.
 
 ```bash
 cloudflared tunnel --url http://localhost:5173
 ```
 
-4. In Discord Developer Portal, enable Activities and map `/` to the cloudflared public URL.
-5. Prefer `/activity` as the Activity Entry Point URL. If Discord opens `/`, the app detects iframe embedding and redirects to `/activity`.
-6. Launch the Activity from Discord and verify SDK status, guild ID, and channel ID. If `channel_id` is unavailable, the app shows an empty state instead of crashing.
-
-Use `/activity?debug=1` while testing to keep the Activity page from redirecting to the channel dashboard. The debug view shows SDK status, guild ID, channel ID, user ID, and the active API base URL.
-
-API smoke tests inside Activity should wait until backend CORS allows the cloudflared URL. The final deployment target remains `app.flodi.site` for the frontend and `api.flodi.site` for the backend.
-
-## Discord Activity Plan
-
-The Discord boundary lives in `src/lib/discord/`. The current provider supports normal web mode and Discord Activity mode. Later production setup should use Discord URL Mapping with `/ -> app.flodi.site` and `/api -> api.flodi.site`.
+Set the backend bot's `FRONTEND_BASE_URL` to that public dashboard URL so meeting messages link to the web dashboard.

@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import type { ChannelDashboardData, Decision, Meeting, MeetingContext, Project } from "./types";
+import type { ActiveMeeting, ChannelDashboardData, Decision, Meeting, MeetingContext, Project } from "./types";
 
 export function getProjects() {
   return apiRequest<Project[]>("/api/v1/projects");
@@ -24,6 +24,10 @@ export function getMeeting(meetingId: string | number) {
 export function getMeetingContext(meetingId: string | number, question?: string) {
   const params = question ? `?question=${encodeURIComponent(question)}` : "";
   return apiRequest<MeetingContext | null>(`/internal/v1/meetings/${meetingId}/context${params}`);
+}
+
+export function getActiveMeeting(channelId: string) {
+  return apiRequest<ActiveMeeting | null>(`/api/v1/channels/${channelId}/active-meeting`);
 }
 
 export async function getChannelDashboard(channelId: string): Promise<ChannelDashboardData> {

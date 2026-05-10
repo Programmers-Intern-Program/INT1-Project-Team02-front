@@ -1,5 +1,3 @@
-﻿import { isDiscordActivityEnvironment } from "../lib/discord/environment";
-
 export type ApiEnvelope<T> = {
   resultCode?: string;
   msg?: string;
@@ -11,20 +9,7 @@ export type ApiError = Error & {
   details?: unknown;
 };
 
-const fallbackBaseUrl = "http://localhost:8080";
-
-function configuredBaseUrl() {
-  const webBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? fallbackBaseUrl;
-  const activityBaseUrl = import.meta.env.VITE_ACTIVITY_API_BASE_URL?.replace(/\/$/, "");
-
-  if (isDiscordActivityEnvironment() && activityBaseUrl) {
-    return activityBaseUrl;
-  }
-
-  return webBaseUrl;
-}
-
-export const apiBaseUrl = configuredBaseUrl();
+export const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
 
 function isEnvelope<T>(value: unknown): value is ApiEnvelope<T> {
   return Boolean(value && typeof value === "object" && "data" in value);
