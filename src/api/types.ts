@@ -83,6 +83,19 @@ export type ActiveMeeting = {
   title: string | null;
 };
 
+export type AiAnswerStatus = "PENDING" | "COMPLETED" | "FALLBACK";
+
+export type AiAnswerEvent = {
+  meetingId: number;
+  utteranceId: number;
+  speakerDiscordId: string;
+  question: string;
+  answer: string;
+  status: AiAnswerStatus;
+  elapsedMs: number;
+  createdAt: string;
+};
+
 export type CaptionEvent = {
   type: "caption.partial" | "caption.final";
   meetingId: number;

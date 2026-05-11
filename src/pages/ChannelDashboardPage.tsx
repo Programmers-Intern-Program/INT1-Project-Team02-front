@@ -1,8 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { Cable, CheckCircle2, ExternalLink, GitBranch, ListChecks, MessageSquareText, Subtitles } from "lucide-react";
-import { useState } from "react";
+import {
+  Cable,
+  CheckCircle2,
+  ExternalLink,
+  GitBranch,
+  ListChecks,
+  MessageSquareText,
+  PictureInPicture2,
+  Subtitles,
+} from "lucide-react";
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getActiveMeeting, getChannelDashboard } from "../api/flodi";
+import { AiAnswerPanel } from "../components/AiAnswerPanel";
 import { CaptionOverlay } from "../components/CaptionOverlay";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
@@ -10,11 +20,26 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Panel } from "../components/ui/Panel";
 import { StatusPill } from "../components/ui/StatusPill";
+import { useCaptionPiP } from "../context/useCaptionPiP";
 import { formatDateTime } from "../lib/utils";
 
 export function ChannelDashboardPage() {
   const { channelId = "unknown-channel" } = useParams();
-  const [showCaptions, setShowCaptions] = useState(false);
+
+  const {
+    endedMeetingId,
+    isCaptionsVisible,
+    isPiPOpen,
+    isPiPSupported,
+    captions,
+    currentPartials,
+    connectionStatus,
+    answers,
+    showCaptions,
+    hideCaptions,
+    openPiP,
+    closePiP,
+  } = useCaptionPiP();
 
   const dashboardQuery = useQuery({
     queryKey: ["channel-dashboard", channelId],
@@ -31,6 +56,24 @@ export function ChannelDashboardPage() {
   const recentDecisions = dashboardQuery.data?.decisions ?? [];
   const activeMeeting = activeMeetingQuery.data ?? null;
 
+  // STOMP 종료 이벤트가 오기 전에 폴링으로 null이 되면 자막 닫기
+  useEffect(() => {
+    if (activeMeetingQuery.isSuccess && !activeMeeting && isCaptionsVisible) {
+      hideCaptions();
+    }
+  }, [activeMeeting, activeMeetingQuery.isSuccess, isCaptionsVisible, hideCaptions]);
+
+  // STOMP 종료 이벤트 즉시 반영 — 30초 폴링 전에도 버튼 비활성화
+  const canShowCaptions = Boolean(activeMeeting) && activeMeeting?.meetingId !== endedMeetingId;
+
+  function handleToggleCaptions() {
+    if (isCaptionsVisible) {
+      hideCaptions();
+    } else if (activeMeeting) {
+      showCaptions(activeMeeting.meetingId);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -41,13 +84,32 @@ export function ChannelDashboardPage() {
           <div className="flex items-center gap-2">
             <Button
               variant="secondary"
-              disabled={!activeMeeting}
-              title={activeMeeting ? undefined : "진행 중인 회의가 없습니다"}
-              onClick={() => setShowCaptions((v) => !v)}
+              disabled={!canShowCaptions}
+              title={canShowCaptions ? undefined : "진행 중인 회의가 없습니다"}
+              onClick={handleToggleCaptions}
             >
               <Subtitles size={16} />
-              {showCaptions ? "자막 숨기기" : "자막 보기"}
+              {isCaptionsVisible ? "자막 숨기기" : "자막 보기"}
             </Button>
+
+            {isCaptionsVisible && canShowCaptions && (
+              <Button
+                variant="secondary"
+                disabled={!isPiPSupported}
+                onClick={isPiPOpen ? closePiP : () => void openPiP()}
+                title={
+                  !isPiPSupported
+                    ? "Chrome 116+ 에서만 지원됩니다"
+                    : isPiPOpen
+                      ? "자막을 페이지에 통합합니다"
+                      : "자막을 별도 창으로 분리합니다"
+                }
+              >
+                <PictureInPicture2 size={16} />
+                {isPiPOpen ? "창 통합" : "창 분리"}
+              </Button>
+            )}
+
             {project && (
               <Link to={`/projects/${project.id}`}>
                 <Button variant="secondary">
@@ -60,9 +122,27 @@ export function ChannelDashboardPage() {
         }
       />
 
-      {showCaptions && activeMeeting && <CaptionOverlay meetingId={activeMeeting.meetingId} />}
+      {/* 인라인 자막 (PiP가 꺼져 있을 때) */}
+      {isCaptionsVisible && canShowCaptions && !isPiPOpen && (
+        <CaptionOverlay
+          captions={captions}
+          currentPartials={currentPartials}
+          connectionStatus={connectionStatus}
+        />
+      )}
 
-      {!activeMeeting && showCaptions === false && activeMeetingQuery.isSuccess && (
+      {/* PiP 창 분리 중 안내 */}
+      {isCaptionsVisible && canShowCaptions && isPiPOpen && (
+        <Panel>
+          <p className="text-sm text-slate-500">자막이 별도 창에서 표시되고 있습니다.</p>
+        </Panel>
+      )}
+
+      {activeMeeting && (answers.length > 0 || canShowCaptions) && (
+        <AiAnswerPanel answers={answers} />
+      )}
+
+      {!activeMeeting && !isCaptionsVisible && activeMeetingQuery.isSuccess && (
         <Panel>
           <p className="text-sm text-slate-500">진행 중인 회의가 없습니다. 회의가 시작되면 자막 보기가 활성화됩니다.</p>
         </Panel>

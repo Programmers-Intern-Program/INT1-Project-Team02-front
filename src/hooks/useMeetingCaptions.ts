@@ -1,22 +1,23 @@
 import { Client } from "@stomp/stompjs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { stompBrokerUrl } from "../api/client";
 import type { CaptionEvent } from "../api/types";
 
 export type CaptionConnectionStatus = "disconnected" | "connecting" | "connected";
 
-function buildStompBrokerUrl(): string {
-  const base = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
-  return base.replace(/^http/, "ws") + "/ws";
-}
-
-export function useMeetingCaptions(meetingId: number | null) {
+export function useMeetingCaptions(meetingId: number | null, onMeetingEnded?: (meetingId: number) => void) {
   const [captions, setCaptions] = useState<CaptionEvent[]>([]);
   const [currentPartials, setCurrentPartials] = useState<Map<string, CaptionEvent>>(new Map());
   const [stompConnected, setStompConnected] = useState(false);
 
+  // ref로 관리해 dependency array에서 제외 — 콜백이 바뀌어도 재연결하지 않음
+  const onMeetingEndedRef = useRef(onMeetingEnded);
+  useEffect(() => {
+    onMeetingEndedRef.current = onMeetingEnded;
+  }, [onMeetingEnded]);
+
   const canConnect = meetingId != null;
 
-  // "connecting" 상태를 파생 계산해 effect 내 동기 setState 제거
   const connectionStatus: CaptionConnectionStatus = !canConnect
     ? "disconnected"
     : stompConnected
@@ -27,10 +28,11 @@ export function useMeetingCaptions(meetingId: number | null) {
     if (!canConnect || meetingId == null) return;
 
     const client = new Client({
-      brokerURL: buildStompBrokerUrl(),
+      brokerURL: stompBrokerUrl,
       reconnectDelay: 3000,
       onConnect: () => {
         setStompConnected(true);
+
         client.subscribe(`/topic/meetings/${meetingId}/captions`, (message) => {
           const event = JSON.parse(message.body) as CaptionEvent;
           if (event.isFinal) {
@@ -50,6 +52,13 @@ export function useMeetingCaptions(meetingId: number | null) {
             });
           }
         });
+
+        client.subscribe(`/topic/meetings/${meetingId}/status`, (message) => {
+          const event = JSON.parse(message.body) as { type: string; meetingId: number };
+          if (event.type === "meeting.ended") {
+            onMeetingEndedRef.current?.(event.meetingId);
+          }
+        });
       },
       onDisconnect: () => setStompConnected(false),
       onStompError: () => setStompConnected(false),
@@ -60,6 +69,8 @@ export function useMeetingCaptions(meetingId: number | null) {
     return () => {
       client.deactivate();
       setStompConnected(false);
+      setCaptions([]);
+      setCurrentPartials(new Map());
     };
   }, [canConnect, meetingId]);
 

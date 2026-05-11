@@ -1,5 +1,7 @@
-import { Wifi, WifiOff, LoaderCircle } from "lucide-react";
-import { useMeetingCaptions, type CaptionConnectionStatus } from "../hooks/useMeetingCaptions";
+import { LoaderCircle, Wifi, WifiOff } from "lucide-react";
+import { useEffect, useRef } from "react";
+import type { CaptionEvent } from "../api/types";
+import type { CaptionConnectionStatus } from "../hooks/useMeetingCaptions";
 import { Panel } from "./ui/Panel";
 
 function ConnectionIndicator({ status }: { status: CaptionConnectionStatus }) {
@@ -27,9 +29,27 @@ function ConnectionIndicator({ status }: { status: CaptionConnectionStatus }) {
   );
 }
 
-export function CaptionOverlay({ meetingId }: { meetingId: number }) {
-  const { captions, currentPartials, connectionStatus } = useMeetingCaptions(meetingId);
+interface CaptionOverlayProps {
+  captions: CaptionEvent[];
+  currentPartials: Map<string, CaptionEvent>;
+  connectionStatus: CaptionConnectionStatus;
+}
+
+const SCROLL_THRESHOLD = 80;
+
+export function CaptionOverlay({ captions, currentPartials, connectionStatus }: CaptionOverlayProps) {
   const partialList = Array.from(currentPartials.values());
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // 사용자가 위로 스크롤해 읽고 있으면 강제 스크롤하지 않음
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < SCROLL_THRESHOLD;
+    if (isNearBottom) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [captions, currentPartials]);
 
   return (
     <Panel>
@@ -38,7 +58,7 @@ export function CaptionOverlay({ meetingId }: { meetingId: number }) {
         <ConnectionIndicator status={connectionStatus} />
       </div>
 
-      <div className="max-h-64 space-y-1 overflow-y-auto">
+      <div ref={scrollRef} className="max-h-64 space-y-1 overflow-y-auto">
         {captions.map((caption, i) => (
           <div key={i} className="flex gap-2 rounded px-2 py-1 text-sm text-slate-700">
             <span className="shrink-0 font-medium text-slate-900">{caption.speakerName}</span>

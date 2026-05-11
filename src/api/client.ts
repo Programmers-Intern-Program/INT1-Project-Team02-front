@@ -10,6 +10,7 @@ export type ApiError = Error & {
 };
 
 export const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080").replace(/\/$/, "");
+export const stompBrokerUrl = apiBaseUrl.replace(/^http/, "ws") + "/ws";
 
 function isEnvelope<T>(value: unknown): value is ApiEnvelope<T> {
   return Boolean(value && typeof value === "object" && "data" in value);
