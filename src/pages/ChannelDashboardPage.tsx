@@ -14,6 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import { getActiveMeeting, getChannelDashboard } from "../api/flodi";
 import { AiAnswerPanel } from "../components/AiAnswerPanel";
 import { CaptionOverlay } from "../components/CaptionOverlay";
+import { ContextSummaryPanel } from "../components/ContextSummaryPanel";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -21,6 +22,7 @@ import { PageHeader } from "../components/ui/PageHeader";
 import { Panel } from "../components/ui/Panel";
 import { StatusPill } from "../components/ui/StatusPill";
 import { useCaptionPiP } from "../context/useCaptionPiP";
+import { useContextSummary } from "../hooks/useContextSummary";
 import { formatDateTime } from "../lib/utils";
 
 export function ChannelDashboardPage() {
@@ -56,14 +58,14 @@ export function ChannelDashboardPage() {
   const recentDecisions = dashboardQuery.data?.decisions ?? [];
   const activeMeeting = activeMeetingQuery.data ?? null;
 
-  // STOMP 종료 이벤트가 오기 전에 폴링으로 null이 되면 자막 닫기
+  const { summary, version } = useContextSummary(activeMeeting?.meetingId ?? null);
+
   useEffect(() => {
     if (activeMeetingQuery.isSuccess && !activeMeeting && isCaptionsVisible) {
       hideCaptions();
     }
   }, [activeMeeting, activeMeetingQuery.isSuccess, isCaptionsVisible, hideCaptions]);
 
-  // STOMP 종료 이벤트 즉시 반영 — 30초 폴링 전에도 버튼 비활성화
   const canShowCaptions = Boolean(activeMeeting) && activeMeeting?.meetingId !== endedMeetingId;
 
   function handleToggleCaptions() {
@@ -122,24 +124,26 @@ export function ChannelDashboardPage() {
         }
       />
 
-      {/* 인라인 자막 (PiP가 꺼져 있을 때) */}
-      {isCaptionsVisible && canShowCaptions && !isPiPOpen && (
-        <CaptionOverlay
-          captions={captions}
-          currentPartials={currentPartials}
-          connectionStatus={connectionStatus}
-        />
-      )}
-
-      {/* PiP 창 분리 중 안내 */}
-      {isCaptionsVisible && canShowCaptions && isPiPOpen && (
-        <Panel>
-          <p className="text-sm text-slate-500">자막이 별도 창에서 표시되고 있습니다.</p>
-        </Panel>
-      )}
-
-      {activeMeeting && (answers.length > 0 || canShowCaptions) && (
-        <AiAnswerPanel answers={answers} />
+      {/* 회의 중 실시간 패널 — 좌: 자막+AI / 우: 진행 맥락 */}
+      {activeMeeting && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="space-y-4">
+            {isCaptionsVisible && !isPiPOpen && (
+              <CaptionOverlay
+                captions={captions}
+                currentPartials={currentPartials}
+                connectionStatus={connectionStatus}
+              />
+            )}
+            {isCaptionsVisible && isPiPOpen && (
+              <Panel>
+                <p className="text-sm text-slate-500">자막이 별도 창에서 표시되고 있습니다.</p>
+              </Panel>
+            )}
+            <AiAnswerPanel answers={answers} />
+          </div>
+          <ContextSummaryPanel summary={summary} version={version} />
+        </div>
       )}
 
       {!activeMeeting && !isCaptionsVisible && activeMeetingQuery.isSuccess && (

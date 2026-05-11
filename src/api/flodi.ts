@@ -30,6 +30,12 @@ export function getActiveMeeting(channelId: string) {
   return apiRequest<ActiveMeeting | null>(`/api/v1/channels/${channelId}/active-meeting`);
 }
 
+export function getRollingSummary(meetingId: number) {
+  return apiRequest<{ meetingId: number; summary: string; version: number } | null>(
+    `/api/v1/meetings/${meetingId}/rolling-summary`,
+  );
+}
+
 export async function getChannelDashboard(channelId: string): Promise<ChannelDashboardData> {
   const project = await getProjectByChannel(channelId);
   if (!project) {

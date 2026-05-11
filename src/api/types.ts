@@ -83,6 +83,12 @@ export type ActiveMeeting = {
   title: string | null;
 };
 
+export type ContextSummaryEvent = {
+  meetingId: number;
+  summary: string;
+  version: number;
+};
+
 export type AiAnswerStatus = "PENDING" | "COMPLETED" | "FALLBACK";
 
 export type AiAnswerEvent = {
