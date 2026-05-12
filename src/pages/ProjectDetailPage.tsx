@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { CalendarDays, CheckCircle2, ListTodo, MessageSquareText } from "lucide-react";
-import { getProject, getProjectDecisions } from "../api/flodi";
+import { getProject, getProjectDecisions, getProjectMeetings } from "../api/flodi";
 import { Badge } from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/ui/PageHeader";
@@ -18,6 +18,11 @@ export function ProjectDetailPage() {
   const decisionsQuery = useQuery({
     queryKey: ["project-decisions", projectId],
     queryFn: () => getProjectDecisions(projectId),
+    enabled: Boolean(projectId),
+  });
+  const meetingsQuery = useQuery({
+    queryKey: ["project-meetings", projectId],
+    queryFn: () => getProjectMeetings(projectId),
     enabled: Boolean(projectId),
   });
 
@@ -50,7 +55,26 @@ export function ProjectDetailPage() {
           </Panel>
 
           <Panel title="Related meetings">
-            <EmptyState title="회의 목록 API 연결 대기" description="현재 백엔드에는 프로젝트별 회의 목록 조회가 없어 회의 상세 URL로 진입합니다." icon={<MessageSquareText size={18} />} />
+            {meetingsQuery.isLoading ? (
+              <p className="text-sm text-slate-500">회의 목록을 불러오는 중입니다.</p>
+            ) : meetingsQuery.isError ? (
+              <EmptyState title="회의 목록을 불러오지 못했습니다" icon={<MessageSquareText size={18} />} />
+            ) : !meetingsQuery.data?.length ? (
+              <EmptyState title="회의 없음" description="봇에서 회의를 시작하면 이곳에 표시됩니다." icon={<MessageSquareText size={18} />} />
+            ) : (
+              <div className="space-y-2">
+                {meetingsQuery.data.map((meeting) => (
+                  <Link
+                    key={meeting.id}
+                    to={`/meetings/${meeting.id}`}
+                    className="flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm hover:border-slate-300 hover:bg-white"
+                  >
+                    <span className="font-medium text-slate-800">{meeting.title ?? `회의 #${meeting.id}`}</span>
+                    <span className="text-xs text-slate-500">{formatDateTime(meeting.startedAt)}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </Panel>
 
           <Panel title="Decisions" className="lg:col-span-2">

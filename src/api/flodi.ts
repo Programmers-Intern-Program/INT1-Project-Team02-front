@@ -1,5 +1,21 @@
-import { apiRequest } from "./client";
+import { apiBaseUrl, apiRequest } from "./client";
 import type { ActiveMeeting, ChannelDashboardData, Decision, Meeting, MeetingContext, Project } from "./types";
+
+export type MeResponse = {
+  userId: string;
+  guildIds: string[];
+};
+
+export function getMe() {
+  return apiRequest<MeResponse>("/auth/v1/me");
+}
+
+export async function logout() {
+  await fetch(`${apiBaseUrl}/auth/v1/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+}
 
 export function getProjects() {
   return apiRequest<Project[]>("/api/v1/projects");
@@ -15,6 +31,10 @@ export function getProjectByChannel(channelId: string) {
 
 export function getProjectDecisions(projectId: string | number) {
   return apiRequest<Decision[]>(`/api/v1/projects/${projectId}/decisions`);
+}
+
+export function getProjectMeetings(projectId: string | number) {
+  return apiRequest<Meeting[]>(`/api/v1/projects/${projectId}/meetings`);
 }
 
 export function getMeeting(meetingId: string | number) {
