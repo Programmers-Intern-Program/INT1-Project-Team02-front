@@ -18,6 +18,7 @@ function isEnvelope<T>(value: unknown): value is ApiEnvelope<T> {
 
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...init?.headers,
