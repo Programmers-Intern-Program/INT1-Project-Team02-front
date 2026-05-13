@@ -11,6 +11,8 @@ import { ProjectsPage } from "./pages/ProjectsPage";
 import { UnauthorizedPage } from "./pages/UnauthorizedPage";
 
 function AuthGuard() {
+  if (import.meta.env.DEV) return <Outlet />;
+
   const meQuery = useQuery({
     queryKey: ["me"],
     queryFn: getMe,
@@ -18,7 +20,6 @@ function AuthGuard() {
   });
 
   if (meQuery.isPending) return null;
-  // TEMP: 인증 우회 - UI 확인 후 아래 주석 해제
   if (meQuery.isError) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
