@@ -8,6 +8,7 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Panel } from "../components/ui/Panel";
 import { useProjectsLiveStatus } from "../hooks/useProjectsLiveStatus";
+import { useProjectsStatusSocket } from "../hooks/useProjectsStatusSocket";
 import { formatDateTime } from "../lib/utils";
 
 export function ProjectsPage() {
@@ -18,6 +19,7 @@ export function ProjectsPage() {
 
   const projects = projectsQuery.data ?? [];
   const liveStatus = useProjectsLiveStatus(projects, () => void projectsQuery.refetch());
+  useProjectsStatusSocket();
 
   return (
     <div className="space-y-6">
