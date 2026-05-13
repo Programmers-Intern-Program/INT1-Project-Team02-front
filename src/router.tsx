@@ -1,5 +1,5 @@
 ﻿import { useQuery } from "@tanstack/react-query";
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { getMe } from "./api/flodi";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ChannelDashboardPage } from "./pages/ChannelDashboardPage";
@@ -19,7 +19,7 @@ function AuthGuard() {
 
   if (meQuery.isPending) return null;
   // TEMP: 인증 우회 - UI 확인 후 아래 주석 해제
-  // if (meQuery.isError) return <Navigate to="/login" replace />;
+  if (meQuery.isError) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
 
@@ -34,7 +34,10 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { index: true, element: <HomePage /> },
-          { path: "channels/:channelId/dashboard", element: <ChannelDashboardPage /> },
+          {
+            path: "channels/:channelId/dashboard",
+            element: <ChannelDashboardPage />,
+          },
           { path: "projects", element: <ProjectsPage /> },
           { path: "projects/:projectId", element: <ProjectDetailPage /> },
           { path: "meetings/:meetingId", element: <MeetingDetailPage /> },
