@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
+﻿import { useQuery } from "@tanstack/react-query";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import { getMe } from "./api/flodi";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ChannelDashboardPage } from "./pages/ChannelDashboardPage";
@@ -18,7 +18,8 @@ function AuthGuard() {
   });
 
   if (meQuery.isPending) return null;
-  if (meQuery.isError) return <Navigate to="/login" replace />;
+  // TEMP: 인증 우회 - UI 확인 후 아래 주석 해제
+  // if (meQuery.isError) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
 

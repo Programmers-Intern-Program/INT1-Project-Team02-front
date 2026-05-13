@@ -8,9 +8,9 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "border-slate-900 bg-slate-900 text-white hover:bg-slate-800",
-  secondary: "border-slate-200 bg-white text-slate-800 hover:border-slate-300 hover:bg-slate-50",
-  ghost: "border-transparent bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+  primary: "border-[#3B82F6] bg-[#3B82F6] text-white shadow-[0_0_24px_rgba(59,130,246,0.28)] hover:border-[#60A5FA] hover:bg-[#60A5FA]",
+  secondary: "border-[#303049] bg-[#1B1B2A] text-[#F8FAFC] hover:border-[#A78BFA]/50 hover:bg-[#24243A]",
+  ghost: "border-transparent bg-transparent text-[#CBD5E1] hover:bg-[#1B1B2A] hover:text-[#F8FAFC]",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

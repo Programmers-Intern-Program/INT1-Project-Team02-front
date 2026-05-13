@@ -4,11 +4,11 @@ import { cn } from "../../lib/utils";
 type BadgeTone = "neutral" | "green" | "amber" | "red" | "blue";
 
 const tones: Record<BadgeTone, string> = {
-  neutral: "border-slate-200 bg-slate-50 text-slate-600",
-  green: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  amber: "border-amber-200 bg-amber-50 text-amber-700",
-  red: "border-rose-200 bg-rose-50 text-rose-700",
-  blue: "border-sky-200 bg-sky-50 text-sky-700",
+  neutral: "border-[#303049] bg-[#1B1B2A] text-[#CBD5E1]",
+  green: "border-[#10B981]/60 bg-[#10B981]/10 text-[#34D399]",
+  amber: "border-[#D7A86E]/70 bg-[#D7A86E]/14 text-[#F2C98B]",
+  red: "border-[#F9A8D4]/60 bg-[#F9A8D4]/12 text-[#FBCFE8]",
+  blue: "border-[#3B82F6]/60 bg-[#3B82F6]/14 text-[#BFDBFE]",
 };
 
 export function Badge({ children, tone = "neutral", className }: PropsWithChildren<{ tone?: BadgeTone; className?: string }>) {
