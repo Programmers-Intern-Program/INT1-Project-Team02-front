@@ -1,7 +1,9 @@
 ﻿import { useQuery } from "@tanstack/react-query";
+import { Client } from "@stomp/stompjs";
 import { Cable, CheckCircle2, ExternalLink, GitBranch, ListChecks, MessageSquareText, PictureInPicture2, Sparkles, Subtitles } from "lucide-react";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { stompBrokerUrl } from "../api/client";
 import { getActiveMeeting, getChannelDashboard } from "../api/flodi";
 import flodiBanner from "../assets/flodi-banner.png";
 import { AiAnswerPanel } from "../components/AiAnswerPanel";
@@ -42,13 +44,33 @@ export function ChannelDashboardPage() {
   const activeMeetingQuery = useQuery({
     queryKey: ["active-meeting", channelId],
     queryFn: () => getActiveMeeting(channelId),
-    refetchInterval: 30_000,
   });
 
   const project = dashboardQuery.data?.project;
+  const projectId = project?.id ?? null;
   const recentDecisions = dashboardQuery.data?.decisions ?? [];
   const activeMeeting = activeMeetingQuery.data ?? null;
   const { summary, version } = useContextSummary(activeMeeting?.meetingId ?? null);
+
+  // 회의 시작/종료를 WebSocket으로 감지해 activeMeetingQuery를 갱신 (폴링 대체)
+  useEffect(() => {
+    if (projectId == null) return;
+
+    const client = new Client({
+      brokerURL: stompBrokerUrl,
+      reconnectDelay: 3000,
+      onConnect: () => {
+        client.subscribe(`/topic/projects/${projectId}/status`, () => {
+          void activeMeetingQuery.refetch();
+        });
+        // 구독 완료 직후 한 번 재조회 — 구독 전 발생한 이벤트 보정
+        void activeMeetingQuery.refetch();
+      },
+    });
+
+    client.activate();
+    return () => { client.deactivate(); };
+  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (activeMeetingQuery.isSuccess && !activeMeeting && isCaptionsVisible) {
