@@ -29,7 +29,9 @@ export type Utterance = {
 export type Project = {
   id: number;
   serverId?: number | string | null;
+  serverName?: string | null;
   channelId?: string | null;
+  channelName?: string | null;
   activeMeetingId?: number | null;
   name: string;
   description?: string | null;
