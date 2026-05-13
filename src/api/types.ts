@@ -29,10 +29,18 @@ export type Utterance = {
 export type Project = {
   id: number;
   serverId?: number | string | null;
+  channelId?: string | null;
+  activeMeetingId?: number | null;
   name: string;
   description?: string | null;
   techStack?: string | null;
   createdAt?: string | null;
+};
+
+export type ProjectStatusEvent = {
+  type: "meeting.started" | "meeting.ended";
+  meetingId: number;
+  channelId: string | null;
 };
 
 export type Meeting = {
