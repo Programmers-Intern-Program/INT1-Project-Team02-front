@@ -1,9 +1,11 @@
 ﻿import { useQuery } from "@tanstack/react-query";
+import { Client } from "@stomp/stompjs";
 import { Cable, CheckCircle2, ExternalLink, GitBranch, ListChecks, MessageSquareText, PictureInPicture2, Sparkles, Subtitles } from "lucide-react";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { stompBrokerUrl } from "../api/client";
 import { getActiveMeeting, getChannelDashboard } from "../api/flodi";
-import flodiBanner from "../assets/flodi-banner.png";
+import flodiBanner from "../assets/flodi-banner-midage3.png";
 import { AiAnswerPanel } from "../components/AiAnswerPanel";
 import { CaptionOverlay } from "../components/CaptionOverlay";
 import { ContextSummaryPanel } from "../components/ContextSummaryPanel";
@@ -42,13 +44,33 @@ export function ChannelDashboardPage() {
   const activeMeetingQuery = useQuery({
     queryKey: ["active-meeting", channelId],
     queryFn: () => getActiveMeeting(channelId),
-    refetchInterval: 30_000,
   });
 
   const project = dashboardQuery.data?.project;
+  const projectId = project?.id ?? null;
   const recentDecisions = dashboardQuery.data?.decisions ?? [];
   const activeMeeting = activeMeetingQuery.data ?? null;
   const { summary, version } = useContextSummary(activeMeeting?.meetingId ?? null);
+
+  // 회의 시작/종료를 WebSocket으로 감지해 activeMeetingQuery를 갱신 (폴링 대체)
+  useEffect(() => {
+    if (projectId == null) return;
+
+    const client = new Client({
+      brokerURL: stompBrokerUrl,
+      reconnectDelay: 3000,
+      onConnect: () => {
+        client.subscribe(`/topic/projects/${projectId}/status`, () => {
+          void activeMeetingQuery.refetch();
+        });
+        // 구독 완료 직후 한 번 재조회 — 구독 전 발생한 이벤트 보정
+        void activeMeetingQuery.refetch();
+      },
+    });
+
+    client.activate();
+    return () => { client.deactivate(); };
+  }, [projectId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (activeMeetingQuery.isSuccess && !activeMeeting && isCaptionsVisible) {
@@ -72,7 +94,17 @@ export function ChannelDashboardPage() {
             <h1 className="mt-2 text-2xl font-semibold text-[#F8FAFC] md:text-3xl">{project?.name ?? "채널 대시보드"}</h1>
             <p className="mt-2 text-sm leading-6 text-[#CBD5E1]">회의 자막, AI 응답, 프로젝트 맥락을 한 화면에서 이어서 봅니다.</p>
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Button variant="secondary" disabled={!canShowCaptions} title={canShowCaptions ? undefined : "진행 중인 회의가 없습니다"} onClick={handleToggleCaptions}>
+              <Button
+                variant="secondary"
+                disabled={!canShowCaptions}
+                title={canShowCaptions ? undefined : "진행 중인 회의가 없습니다"}
+                onClick={handleToggleCaptions}
+                className={
+                  isCaptionsVisible
+                    ? "border-[#10B981] bg-[#10B981] text-[#04130E] shadow-[0_0_24px_rgba(16,185,129,0.28)] hover:border-[#34D399] hover:bg-[#34D399]"
+                    : undefined
+                }
+              >
                 <Subtitles size={16} />
                 {isCaptionsVisible ? "자막 숨기기" : "자막 보기"}
               </Button>
@@ -102,7 +134,7 @@ export function ChannelDashboardPage() {
 
           <div className="relative hidden overflow-hidden lg:block">
             <img src={flodiBanner} alt="Flodi banner" className="absolute inset-0 h-full w-full object-cover object-center" />
-            <div className="absolute inset-0 bg-linear-to-r from-[#12121C] via-[#12121C]/30 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-r from-[#12121C] from-10% via-[#12121C]/20 via-35% to-transparent" />
           </div>
         </div>
       </section>
