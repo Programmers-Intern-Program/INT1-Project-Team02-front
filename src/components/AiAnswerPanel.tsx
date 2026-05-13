@@ -1,4 +1,4 @@
-import { AlertTriangle, Bot, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
+﻿import { AlertTriangle, Bot, ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import type { AiAnswerEvent } from "../api/types";
 import { Panel } from "./ui/Panel";
@@ -15,29 +15,40 @@ function AiAnswerCard({ event }: { event: AiAnswerEvent }) {
   }
 
   return (
-    <div className="max-h-48 space-y-2 overflow-y-auto" onWheel={handleWheel}>
-      <p className="text-xs text-slate-400">{event.question}</p>
-
-      {event.status === "PENDING" && (
-        <p className="flex items-center gap-1.5 text-sm italic text-slate-400">
-          <LoaderCircle size={13} className="animate-spin shrink-0" />
-          {event.answer}
-        </p>
-      )}
-
-      {event.status === "COMPLETED" && (
-        <div className="space-y-0.5">
-          <p className="text-sm text-slate-800">{event.answer}</p>
-          <p className="text-xs text-slate-400">{event.elapsedMs}ms</p>
+    <div className="max-h-64 space-y-3 overflow-y-auto" onWheel={handleWheel}>
+      <div className="flex justify-end">
+        <div className="max-w-[85%] rounded-2xl rounded-tr-sm border border-[#303049] bg-[#1B1B2A] px-3 py-2">
+          <p className="text-xs leading-5 text-[#CBD5E1]">{event.question}</p>
         </div>
-      )}
+      </div>
 
-      {event.status === "FALLBACK" && (
-        <p className="flex items-center gap-1.5 text-sm text-amber-600">
-          <AlertTriangle size={13} className="shrink-0" />
-          {event.answer}
-        </p>
-      )}
+      <div className="flex items-start gap-2">
+        <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-[#A78BFA]/18">
+          <Bot size={12} className="text-[#C4B5FD]" />
+        </div>
+        <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-[#4B3F72] bg-[#1A1830] px-3 py-2">
+          {event.status === "PENDING" && (
+            <p className="flex items-center gap-1.5 text-sm italic text-[#CBD5E1]">
+              <LoaderCircle size={13} className="shrink-0 animate-spin text-[#A78BFA]" />
+              {event.answer}
+            </p>
+          )}
+
+          {event.status === "COMPLETED" && (
+            <div>
+              <p className="text-sm leading-6 text-[#F8FAFC]">{event.answer}</p>
+              <p className="mt-1 text-xs text-[#94A3B8]">{event.elapsedMs}ms</p>
+            </div>
+          )}
+
+          {event.status === "FALLBACK" && (
+            <p className="flex items-center gap-1.5 text-sm text-[#FBBF24]">
+              <AlertTriangle size={13} className="shrink-0" />
+              {event.answer}
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -48,8 +59,6 @@ interface AiAnswerPanelProps {
 
 export function AiAnswerPanel({ answers }: AiAnswerPanelProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  // react-hooks/refs가 render 중 ref 접근을 막으므로 state로 이전 길이를 추적
-  // (render 중 setState는 React 공식 "adjusting state when props change" 패턴)
   const [prevLength, setPrevLength] = useState(answers.length);
   if (answers.length !== prevLength) {
     setPrevLength(answers.length);
@@ -76,29 +85,17 @@ export function AiAnswerPanel({ answers }: AiAnswerPanelProps) {
     <Panel>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Bot size={15} className="text-slate-500" />
-          <span className="text-sm font-medium text-slate-800">AI 답변</span>
+          <Bot size={15} className="text-[#A78BFA]" />
+          <span className="text-sm font-semibold text-[#F8FAFC]">AI 응답</span>
         </div>
 
         {total > 1 && (
           <div className="flex items-center gap-1">
-            <button
-              aria-label="최신 답변으로 이동"
-              onClick={goNewer}
-              disabled={safeIndex === 0}
-              className="rounded p-0.5 text-slate-400 hover:text-slate-600 disabled:opacity-30"
-            >
+            <button aria-label="최신 응답으로 이동" onClick={goNewer} disabled={safeIndex === 0} className="rounded p-0.5 text-[#CBD5E1] hover:text-[#F8FAFC] disabled:opacity-30">
               <ChevronLeft size={15} />
             </button>
-            <span className="min-w-10 text-center text-xs text-slate-400">
-              {safeIndex + 1} / {total}
-            </span>
-            <button
-              aria-label="이전 답변으로 이동"
-              onClick={goOlder}
-              disabled={safeIndex === total - 1}
-              className="rounded p-0.5 text-slate-400 hover:text-slate-600 disabled:opacity-30"
-            >
+            <span className="min-w-10 text-center text-xs text-[#CBD5E1]">{safeIndex + 1} / {total}</span>
+            <button aria-label="이전 응답으로 이동" onClick={goOlder} disabled={safeIndex === total - 1} className="rounded p-0.5 text-[#CBD5E1] hover:text-[#F8FAFC] disabled:opacity-30">
               <ChevronRight size={15} />
             </button>
           </div>
@@ -106,11 +103,7 @@ export function AiAnswerPanel({ answers }: AiAnswerPanelProps) {
       </div>
 
       <div onWheel={handleWheel}>
-        {total === 0 ? (
-          <p className="text-sm text-slate-400">회의 중 AI에게 질문하면 여기에 답변이 표시됩니다.</p>
-        ) : (
-          <AiAnswerCard event={reversed[safeIndex]} />
-        )}
+        {total === 0 ? <p className="text-sm leading-6 text-[#CBD5E1]">회의 중 AI에게 질문하면 여기에 답변이 표시됩니다.</p> : <AiAnswerCard event={reversed[safeIndex]} />}
       </div>
     </Panel>
   );
