@@ -36,3 +36,14 @@ export function formatDateTime(value?: string | null) {
 export function asArray<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
 }
+
+// "Discord 입코더 2026-05-14T02:26:22.909345438" 같은 제목에서
+// ISO 타임스탬프를 제거하고 읽기 좋은 형식으로 변환
+export function formatMeetingTitle(title: string | null | undefined, startedAt?: string | null): string {
+  if (!title) return "회의";
+  const isoMatch = title.match(/(\d{4}-\d{2}-\d{2}T[\d:.]+)/);
+  if (!isoMatch) return title;
+  const prefix = title.replace(isoMatch[0], "").trim();
+  const dateStr = formatDateTime(startedAt ?? isoMatch[0]);
+  return prefix ? `${prefix} · ${dateStr}` : dateStr;
+}
