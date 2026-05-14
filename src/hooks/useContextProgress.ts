@@ -7,7 +7,6 @@ export function useContextProgress(meetingId: number | null) {
   const [progress, setProgress] = useState<ContextProgressEvent | null>(null);
 
   useEffect(() => {
-    setProgress(null);
     if (meetingId == null) return;
 
     const client = new Client({
@@ -28,5 +27,5 @@ export function useContextProgress(meetingId: number | null) {
     };
   }, [meetingId]);
 
-  return progress;
+  return progress?.meetingId === meetingId ? progress : null;
 }

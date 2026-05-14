@@ -1,5 +1,5 @@
 import { apiBaseUrl, apiRequest } from "./client";
-import type { ActiveMeeting, ChannelDashboardData, Decision, Meeting, MeetingContext, Project } from "./types";
+import type { ActiveMeeting, ChannelDashboardData, Decision, Meeting, MeetingContext, Project, WorkLog } from "./types";
 
 export type MeResponse = {
   userId: string;
@@ -35,6 +35,11 @@ export function getProjectDecisions(projectId: string | number) {
 
 export function getProjectMeetings(projectId: string | number) {
   return apiRequest<Meeting[]>(`/api/v1/projects/${projectId}/meetings`);
+}
+
+export function getProjectWorkLogs(projectId: string | number, status?: string) {
+  const params = status ? `?status=${status}` : "";
+  return apiRequest<WorkLog[]>(`/api/v1/projects/${projectId}/work-logs${params}`);
 }
 
 export function getMeeting(meetingId: string | number) {

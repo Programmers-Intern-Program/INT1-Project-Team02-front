@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/ui/PageHeader";
 import { useProjectsLiveStatus } from "../hooks/useProjectsLiveStatus";
+import { useProjectsStatusSocket } from "../hooks/useProjectsStatusSocket";
 import { formatDateTime } from "../lib/utils";
 
 
@@ -36,6 +37,7 @@ export function ProjectsPage() {
 
   const projects = projectsQuery.data ?? [];
   const liveStatus = useProjectsLiveStatus(projects, () => void projectsQuery.refetch());
+  useProjectsStatusSocket();
   const serverGroups = groupByServer(projects);
 
   return (
