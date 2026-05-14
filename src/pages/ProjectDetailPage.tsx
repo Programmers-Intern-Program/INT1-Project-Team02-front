@@ -6,7 +6,6 @@ import { Badge } from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Panel } from "../components/ui/Panel";
-import { StatusPill } from "../components/ui/StatusPill";
 import { MOCK_DECISIONS, MOCK_MEETINGS, MOCK_PROJECTS, MOCK_WORK_LOGS } from "../mocks/data";
 import { formatDateTime } from "../lib/utils";
 

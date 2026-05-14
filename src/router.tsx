@@ -1,6 +1,5 @@
-﻿import { useQuery } from "@tanstack/react-query";
-import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
-import { getMe } from "./api/flodi";
+import { createBrowserRouter } from "react-router-dom";
+import { AuthGuard } from "./components/auth/AuthGuard";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ChannelDashboardPage } from "./pages/ChannelDashboardPage";
 import { HomePage } from "./pages/HomePage";
@@ -9,20 +8,6 @@ import { MeetingDetailPage } from "./pages/MeetingDetailPage";
 import { ProjectDetailPage } from "./pages/ProjectDetailPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { UnauthorizedPage } from "./pages/UnauthorizedPage";
-
-function AuthGuard() {
-  if (import.meta.env.DEV) return <Outlet />;
-
-  const meQuery = useQuery({
-    queryKey: ["me"],
-    queryFn: getMe,
-    retry: false,
-  });
-
-  if (meQuery.isPending) return null;
-  if (meQuery.isError) return <Navigate to="/login" replace />;
-  return <Outlet />;
-}
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },

@@ -21,10 +21,15 @@ export function HomePage() {
       <section className="overflow-hidden rounded-lg border border-[#303049] bg-[#12121C] shadow-[0_18px_48px_rgba(0,0,0,0.36)]">
         <div className="grid min-h-56 lg:grid-cols-2">
           <div className="flex flex-col justify-end px-6 py-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#C4B5FD]">Discord meeting dashboard</p>
-            <h1 className="mt-2 text-3xl font-semibold text-[#F8FAFC]">Flodi dashboard</h1>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#C4B5FD]">
+              Discord meeting dashboard
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold text-[#F8FAFC]">
+              FLODI dashboard
+            </h1>
             <p className="mt-2 text-sm leading-6 text-[#CBD5E1]">
-              Discord 회의의 자막, AI 응답, 프로젝트 기록을 이어서 확인하는 작업 공간입니다.
+              Discord 회의의 자막, AI 응답, 프로젝트 기록을 이어서 확인하는 작업
+              공간입니다.
             </p>
             <div className="mt-5">
               <Link to={`/channels/${channelId}/dashboard`}>
@@ -37,7 +42,11 @@ export function HomePage() {
           </div>
 
           <div className="relative hidden overflow-hidden lg:block">
-            <img src={flodiBanner} alt="Flodi banner" className="absolute inset-0 h-full w-full object-cover object-center" />
+            <img
+              src={flodiBanner}
+              alt="Flodi banner"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
             <div className="absolute inset-0 bg-linear-to-r from-[#12121C] via-[#12121C]/30 to-transparent" />
           </div>
         </div>
@@ -48,15 +57,21 @@ export function HomePage() {
           <Panel title="Current entry point">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-medium text-[#F8FAFC]">Discord button route</p>
-                <p className="mt-1 text-sm text-[#CBD5E1]">/channels/{channelId}/dashboard</p>
+                <p className="text-sm font-medium text-[#F8FAFC]">
+                  Discord button route
+                </p>
+                <p className="mt-1 text-sm text-[#CBD5E1]">
+                  /channels/{channelId}/dashboard
+                </p>
               </div>
             </div>
           </Panel>
 
           <Panel title="Backend connection">
             {projectQuery.isLoading ? (
-              <p className="text-sm text-[#CBD5E1]">채널 프로젝트를 확인하는 중입니다.</p>
+              <p className="text-sm text-[#CBD5E1]">
+                채널 프로젝트를 확인하는 중입니다.
+              </p>
             ) : projectQuery.isError ? (
               <EmptyState
                 title="백엔드 연결 대기 중"
@@ -65,8 +80,12 @@ export function HomePage() {
               />
             ) : projectQuery.data ? (
               <div className="space-y-2">
-                <p className="text-sm font-medium text-[#F8FAFC]">{projectQuery.data.name}</p>
-                <p className="text-sm text-[#CBD5E1]">이 채널에 프로젝트가 연결되어 있습니다.</p>
+                <p className="text-sm font-medium text-[#F8FAFC]">
+                  {projectQuery.data.name}
+                </p>
+                <p className="text-sm text-[#CBD5E1]">
+                  이 채널에 프로젝트가 연결되어 있습니다.
+                </p>
               </div>
             ) : (
               <EmptyState
@@ -84,9 +103,16 @@ export function HomePage() {
               ["Project detail", "/projects/1"],
               ["Meeting detail", "/meetings/1"],
             ].map(([label, href]) => (
-              <Link key={href} to={href} className="group flex items-center justify-between rounded-md border border-[#303049] bg-[#1B1B2A] px-4 py-3 text-sm font-medium text-[#F8FAFC] transition hover:bg-[#24243A]">
+              <Link
+                key={href}
+                to={href}
+                className="group flex items-center justify-between rounded-md border border-[#303049] bg-[#1B1B2A] px-4 py-3 text-sm font-medium text-[#F8FAFC] transition hover:bg-[#24243A]"
+              >
                 {label}
-                <ArrowRight size={15} className="text-[#CBD5E1] transition group-hover:translate-x-0.5" />
+                <ArrowRight
+                  size={15}
+                  className="text-[#CBD5E1] transition group-hover:translate-x-0.5"
+                />
               </Link>
             ))}
           </div>
