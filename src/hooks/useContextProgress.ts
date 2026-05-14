@@ -27,9 +27,5 @@ export function useContextProgress(meetingId: number | null) {
     };
   }, [meetingId]);
 
-<<<<<<< Updated upstream
-  return progress?.meetingId === meetingId ? progress : null;
-=======
   return progress?.meetingId === meetingId ? progress.event : null;
->>>>>>> Stashed changes
 }
