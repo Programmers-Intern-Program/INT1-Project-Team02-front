@@ -4,7 +4,7 @@ import { stompBrokerUrl } from "../api/client";
 import type { ContextProgressEvent } from "../api/types";
 
 export function useContextProgress(meetingId: number | null) {
-  const [progress, setProgress] = useState<ContextProgressEvent | null>(null);
+  const [progress, setProgress] = useState<{ meetingId: number; event: ContextProgressEvent } | null>(null);
 
   useEffect(() => {
     if (meetingId == null) return;
@@ -16,7 +16,7 @@ export function useContextProgress(meetingId: number | null) {
         client.subscribe(`/topic/meetings/${meetingId}/context-progress`, (message) => {
           const event = JSON.parse(message.body) as ContextProgressEvent;
           if (event.meetingId !== meetingId) return;
-          setProgress(event);
+          setProgress({ meetingId, event });
         });
       },
     });
@@ -27,5 +27,5 @@ export function useContextProgress(meetingId: number | null) {
     };
   }, [meetingId]);
 
-  return progress?.meetingId === meetingId ? progress : null;
+  return progress?.meetingId === meetingId ? progress.event : null;
 }
