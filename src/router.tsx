@@ -1,8 +1,7 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AuthGuard } from "./components/auth/AuthGuard";
 import { AppLayout } from "./components/layout/AppLayout";
 import { ChannelDashboardPage } from "./pages/ChannelDashboardPage";
-import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { MeetingDetailPage } from "./pages/MeetingDetailPage";
 import { ProjectDetailPage } from "./pages/ProjectDetailPage";
@@ -19,7 +18,7 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <HomePage /> },
+          { index: true, element: <Navigate to="/projects" replace /> },
           {
             path: "channels/:channelId/dashboard",
             element: <ChannelDashboardPage />,
