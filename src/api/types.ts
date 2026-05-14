@@ -97,6 +97,16 @@ export type ContextSummaryEvent = {
   version: number;
 };
 
+export type ContextProgressEvent = {
+  meetingId: number;
+  uncompressedTokens: number;
+  thresholdTokens: number;
+  remainingTokens: number;
+  progressPercent: number;
+  remainingPercent: number;
+  compressionTriggered: boolean;
+};
+
 export type AiAnswerStatus = "PENDING" | "COMPLETED" | "FALLBACK";
 
 export type AiAnswerEvent = {

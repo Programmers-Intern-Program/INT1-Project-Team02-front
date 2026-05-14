@@ -15,6 +15,7 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { Panel } from "../components/ui/Panel";
 import { StatusPill } from "../components/ui/StatusPill";
 import { useCaptionPiP } from "../context/useCaptionPiP";
+import { useContextProgress } from "../hooks/useContextProgress";
 import { useContextSummary } from "../hooks/useContextSummary";
 import { formatDateTime } from "../lib/utils";
 
@@ -51,6 +52,7 @@ export function ChannelDashboardPage() {
   const recentDecisions = dashboardQuery.data?.decisions ?? [];
   const activeMeeting = activeMeetingQuery.data ?? null;
   const { summary, version } = useContextSummary(activeMeeting?.meetingId ?? null);
+  const contextProgress = useContextProgress(activeMeeting?.meetingId ?? null);
 
   // 회의 시작/종료를 WebSocket으로 감지해 activeMeetingQuery를 갱신 (폴링 대체)
   useEffect(() => {
@@ -102,7 +104,7 @@ export function ChannelDashboardPage() {
                 className={
                   isCaptionsVisible
                     ? "border-[#10B981] bg-[#10B981] text-[#04130E] shadow-[0_0_24px_rgba(16,185,129,0.28)] hover:border-[#34D399] hover:bg-[#34D399]"
-                    : undefined
+                    : "border-[#A78BFA]/70 bg-[#2A2142] text-[#F8FAFC] shadow-[0_0_22px_rgba(167,139,250,0.22)] hover:border-[#C4B5FD] hover:bg-[#332955] disabled:border-[#A78BFA]/55 disabled:bg-[#2A2142]/90 disabled:text-[#EDE9FE] disabled:opacity-100"
                 }
               >
                 <Subtitles size={16} />
@@ -155,7 +157,7 @@ export function ChannelDashboardPage() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             <AiAnswerPanel answers={answers} />
-            <ContextSummaryPanel summary={summary} version={version} />
+            <ContextSummaryPanel summary={summary} version={version} progress={contextProgress} />
           </div>
         </div>
       )}
