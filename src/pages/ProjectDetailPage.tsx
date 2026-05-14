@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Panel } from "../components/ui/Panel";
 import { StatusPill } from "../components/ui/StatusPill";
-import { formatDateTime } from "../lib/utils";
+import { formatDateTime, formatMeetingTitle } from "../lib/utils";
 
 const STATUS_STYLE: Record<string, string> = {
   DONE: "bg-[#10B981]/10 text-[#34D399]",
@@ -30,7 +30,7 @@ function MeetingCard({ meeting }: { meeting: Meeting }) {
     >
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-[#F8FAFC]">
-          {meeting.title ?? `회의 #${meeting.id}`}
+          {formatMeetingTitle(meeting.title, meeting.startedAt)}
         </p>
         <p className="mt-0.5 text-xs text-[#CBD5E1]/60">{formatDateTime(meeting.startedAt)}</p>
       </div>
