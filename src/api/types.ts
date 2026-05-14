@@ -29,7 +29,9 @@ export type Utterance = {
 export type Project = {
   id: number;
   serverId?: number | string | null;
+  serverName?: string | null;
   channelId?: string | null;
+  channelName?: string | null;
   activeMeetingId?: number | null;
   name: string;
   description?: string | null;
@@ -95,6 +97,16 @@ export type ContextSummaryEvent = {
   meetingId: number;
   summary: string;
   version: number;
+};
+
+export type ContextProgressEvent = {
+  meetingId: number;
+  uncompressedTokens: number;
+  thresholdTokens: number;
+  remainingTokens: number;
+  progressPercent: number;
+  remainingPercent: number;
+  compressionTriggered: boolean;
 };
 
 export type AiAnswerStatus = "PENDING" | "COMPLETED" | "FALLBACK";
