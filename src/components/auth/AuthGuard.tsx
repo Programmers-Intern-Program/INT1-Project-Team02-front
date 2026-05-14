@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { getMe } from "../../api/flodi";
+import { buildLoginPath } from "../../lib/authRedirect";
 
 export function AuthGuard() {
   const isDev = import.meta.env.DEV;
+  const location = useLocation();
   const meQuery = useQuery({
     queryKey: ["me"],
     queryFn: getMe,
@@ -13,6 +15,6 @@ export function AuthGuard() {
 
   if (isDev) return <Outlet />;
   if (meQuery.isPending) return null;
-  if (meQuery.isError) return <Navigate to="/login" replace />;
+  if (meQuery.isError) return <Navigate to={buildLoginPath(`${location.pathname}${location.search}`)} replace />;
   return <Outlet />;
 }
